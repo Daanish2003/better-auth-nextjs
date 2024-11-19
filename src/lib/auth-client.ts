@@ -7,5 +7,5 @@ export const {
     getSession,
     useSession,
 } = createAuthClient({
-    baseURL: process.env.BETTER_AUTH_URL // the base url of your auth server
+    baseURL: process.env.BETTER_AUTH_URL,
 })
