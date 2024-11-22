@@ -6,8 +6,8 @@ interface CardWrapperType {
     children: React.ReactNode,
     cardTitle: string,
     cardDescription: string
-    cardFooterLinkTitle: string,
-    cardFooterDescription: string
+    cardFooterLinkTitle?: string,
+    cardFooterDescription?: string
     cardFooterLink: string
 }
 
@@ -17,7 +17,7 @@ const CardWrapper = ({
     cardDescription,
     cardFooterLinkTitle,
     cardFooterDescription,
-    cardFooterLink
+    cardFooterLink,
 }: CardWrapperType) => {
     return (
         <Card className="w-[400px]">

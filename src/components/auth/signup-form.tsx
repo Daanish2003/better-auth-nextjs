@@ -136,7 +136,7 @@ const SignupForm = () => {
                     />
                     <FormError message={error} />
                     <FormSuccess message={success} />
-                    <Button type="submit" className="w-full" disabled={loading}>Login</Button>
+                    <Button type="submit" className="w-full" disabled={loading}>Submit</Button>
                 </form>
             </Form>
         </CardWrapper>
