@@ -9,14 +9,17 @@ import { Input } from '../ui/input'
 import { signIn } from '@/lib/auth-client'
 import { Button } from '../ui/button'
 import { useState } from 'react'
-// import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import FormError from '../form-error'
 import { FormSuccess } from '../form-success'
+import Link from 'next/link'
+import { Separator } from '../ui/separator'
+import GithubButton from './github-button'
 
 
 
 const LoginForm = () => {
-  // const router = useRouter()
+  const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -30,28 +33,33 @@ const LoginForm = () => {
   })
 
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-    setSuccess("")
-    setError("")
-    await signIn.email({
-      email: values.email,
-      password: values.password
-    }, {
-      onResponse: () => {
-        setLoading(false)
-      },
-      onRequest: () => {
-        setLoading(true)
-      },
-      onSuccess: (ctx) => {
-        if (!ctx.data.twoFactorRedirect) {
-          setSuccess("LoggedIn successfully")
-
-        }
-      },
-      onError: (ctx) => {
-        setError(ctx.error.message);
-      },
-    });
+    try {
+      await signIn.email({
+        email: values.email,
+        password: values.password
+      }, {
+        onResponse: () => {
+          setLoading(false)
+        },
+        onRequest: () => {
+          setSuccess("")
+          setError("")
+          setLoading(true)
+        },
+        onSuccess: (ctx) => {
+          if (!ctx.data.twoFactorRedirect) {
+            setSuccess("LoggedIn successfully")
+            router.replace('/')
+          }
+        },
+        onError: (ctx) => {
+          setError(ctx.error.message);
+        },
+      });
+    } catch (error) {
+      console.log(error)
+      setError("Something went wrong")
+    }
   }
 
   return (
@@ -97,12 +105,16 @@ const LoginForm = () => {
                   />
                 </FormControl>
                 <FormMessage />
+                <Link href={"/forgot-password"} className='text-xs underline ml-60'>Forgot Password?</Link>
               </FormItem>
+
             )}
           />
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button disabled={loading} type="submit" className='w-full'>Login</Button>
+          <Separator />
+          <GithubButton />
         </form>
       </Form>
     </CardWrapper>
