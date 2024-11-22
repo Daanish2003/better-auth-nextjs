@@ -27,26 +27,41 @@ const TwoFactorForm = () => {
     })
 
     const requestOTP = async () => {
-        const res = await twoFactor.sendOtp()
-
-        if(res.data) {
-          setSuccess("OTP sent to your email")
-        } 
-        
-        if(res.error){
-          setError(res.error.message)
+        try {
+            await twoFactor.sendOtp({
+              
+            }, {
+                onResponse: () => {
+                    setLoading(false)
+                },
+                onRequest: () => {
+                    setError("")
+                    setSuccess("")
+                    setLoading(true)
+                },
+                onSuccess: () => {
+                    setSuccess("OTP has been sent")
+                },
+                onError: (ctx) => {
+                    setError(ctx.error.message)
+                }
+            })
+        } catch (error: unknown) {
+            console.error(error)
         }
+
+
     }
 
     const onSubmit = async (values: z.infer<typeof twoFactorSchema>) => {
-        setError("")
-        setSuccess("")
-        setLoading(true)
-        console.log(values.code)
-
         await twoFactor.verifyOtp({
             code: values.code
         }, {
+            onRequest: () => {
+                setError("")
+                setSuccess("")
+                setLoading(true)
+            },
             onSuccess() {
                 setSuccess("OTP validated successfully")
                 setLoading(false)
@@ -74,30 +89,30 @@ const TwoFactorForm = () => {
                         name='code'
                         render={({ field }) => (
                             <>
-                            <FormItem>
-                                <FormLabel>One-Time Password</FormLabel>
-                                <InputOTP
-                                    maxLength={6}
-                                    pattern={REGEXP_ONLY_DIGITS}
-                                    {...field}
-                                    disabled={loading}
-    
-                                >
-                                    <InputOTPGroup>
-                                        <InputOTPSlot index={0} />
-                                        <InputOTPSlot index={1} />
-                                        <InputOTPSlot index={2} />
-                                        <InputOTPSlot index={3} />
-                                        <InputOTPSlot index={4} />
-                                        <InputOTPSlot index={5} />
-                                    </InputOTPGroup>
-                                </InputOTP>
-                                <FormMessage />
-                            </FormItem>
-                            <Button onClick={requestOTP} variant={"link"} className='text-xs underline ml-60'>
-                            Resend OTP
-                        </Button>
-                        </>
+                                <FormItem>
+                                    <FormLabel>One-Time Password</FormLabel>
+                                    <InputOTP
+                                        maxLength={6}
+                                        pattern={REGEXP_ONLY_DIGITS}
+                                        {...field}
+                                        disabled={loading}
+
+                                    >
+                                        <InputOTPGroup>
+                                            <InputOTPSlot index={0} />
+                                            <InputOTPSlot index={1} />
+                                            <InputOTPSlot index={2} />
+                                            <InputOTPSlot index={3} />
+                                            <InputOTPSlot index={4} />
+                                            <InputOTPSlot index={5} />
+                                        </InputOTPGroup>
+                                    </InputOTP>
+                                    <FormMessage />
+                                </FormItem>
+                                <Button onClick={requestOTP} variant={"link"} className='text-xs underline ml-60'>
+                                    Resend OTP
+                                </Button>
+                            </>
                         )}
                     />
                     <FormError message={error} />

@@ -6,22 +6,23 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../ui/input'
-// import { useRouter } from 'next/navigation'
 import { SignupSchema } from '@/helpers/zod/signup-schema'
 import CardWrapper from '../card-wrapper'
 import FormError from '../form-error'
 import { FormSuccess } from '../form-success'
 import { signUp } from '@/lib/auth-client'
+import { Separator } from '../ui/separator'
+import GithubButton from './github-button'
 
 
 
 const SignupForm = () => {
-    // const router = useRouter()
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
 
     const form = useForm<z.infer<typeof SignupSchema>>({
+        mode: "onBlur",
         resolver: zodResolver(SignupSchema),
         defaultValues: {
             name: '',
@@ -32,24 +33,31 @@ const SignupForm = () => {
     })
 
     const onSubmit = async (values: z.infer<typeof SignupSchema>) => {
-        setError("")
-        setSuccess("")
-
-        await signUp.email({
-            name: values.name, 
-            email: values.email, 
-            password: values.password,
-         }, { 
-            onRequest: () => { 
-             setLoading(true)
-            }, 
-            onSuccess: () => {
-              setSuccess("Email verification link has been sent")
-            }, 
-            onError: (ctx) => { 
-              setError(ctx.error.message); 
-            }, 
-          });
+        try {
+            await signUp.email({
+                name: values.name,
+                email: values.email,
+                password: values.password,
+            }, {
+                onResponse: () => {
+                    setLoading(false)
+                },
+                onRequest: () => {
+                    setError("")
+                    setSuccess("")
+                    setLoading(true)
+                },
+                onSuccess: () => {
+                    setSuccess("Email verification link has been sent")
+                },
+                onError: (ctx) => {
+                    setError(ctx.error.message);
+                },
+            });
+        } catch (error) {
+            console.error(error)
+            setError("Something went wrong")
+        }
 
     }
 
@@ -64,7 +72,7 @@ const SignupForm = () => {
         >
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
+                    <FormField
                         control={form.control}
                         name="name"
                         render={({ field }) => (
@@ -136,6 +144,8 @@ const SignupForm = () => {
                     <FormError message={error} />
                     <FormSuccess message={success} />
                     <Button type="submit" className="w-full" disabled={loading}>Submit</Button>
+                    <Separator />
+                    <GithubButton />
                 </form>
             </Form>
         </CardWrapper>

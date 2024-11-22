@@ -18,7 +18,15 @@ export const auth = betterAuth({
     maxPasswordLength: 20,
     minPasswordLength: 8,
     requireEmailVerification: true,
-    autoSignIn: false
+    autoSignIn: true,
+    sendResetPassword: async ({user, url}) => {
+      await resend.emails.send({
+        from: 'Acme <onboarding@resend.dev>',
+        to: user.email,
+        subject: "Reset your password",
+        html: `Click the link to reset your password: ${url}`
+      })
+    }
   },
   emailVerification: {
      sendOnSignUp: true,
@@ -27,7 +35,7 @@ export const auth = betterAuth({
       await resend.emails.send({
         from: 'Acme <onboarding@resend.dev>',
         to: user.email,
-        subject: "Two Factor",
+        subject: "Email Verification",
         html: `Click the link to verify your email: ${url}`
       })
      },

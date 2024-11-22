@@ -7,7 +7,9 @@ export const {
     signOut,
     getSession,
     useSession,
-    twoFactor
+    twoFactor,
+    forgetPassword,
+    resetPassword
 } = createAuthClient({
     baseURL: process.env.BETTER_AUTH_URL,
     plugins: [

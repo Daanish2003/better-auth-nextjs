@@ -20,7 +20,7 @@ const CardWrapper = ({
     cardFooterLink,
 }: CardWrapperType) => {
     return (
-        <Card className="w-[400px]">
+        <Card className="w-[400px] relative">
             <CardHeader>
                 <CardTitle>{cardTitle}</CardTitle>
                 <CardDescription>{cardDescription}</CardDescription>
