@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../ui/input'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { SignupSchema } from '@/helpers/zod/signup-schema'
 import CardWrapper from '../card-wrapper'
 import FormError from '../form-error'
@@ -16,7 +16,7 @@ import { signUp } from '@/lib/auth-client'
 
 
 const SignupForm = () => {
-    const router = useRouter()
+    // const router = useRouter()
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
@@ -43,9 +43,8 @@ const SignupForm = () => {
             onRequest: () => { 
              setLoading(true)
             }, 
-            onSuccess: () => { 
-              setSuccess("Your account has been created")
-              router.replace('/')
+            onSuccess: () => {
+              setSuccess("Email verification link has been sent")
             }, 
             onError: (ctx) => { 
               setError(ctx.error.message); 

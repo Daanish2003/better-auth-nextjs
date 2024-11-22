@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { twoFactor } from "better-auth/plugins"
 import prisma from "../db";
 import { resend } from "@/helpers/email/resend";
+import { nextCookies } from "better-auth/next-js";
 
 // const from = process.env.BETTER_AUTH_EMAIL || "delivered@resend.dev";
 // const to = process.env.TEST_EMAIL || "";
@@ -16,7 +17,25 @@ export const auth = betterAuth({
     enabled: true,
     maxPasswordLength: 20,
     minPasswordLength: 8,
-    
+    requireEmailVerification: true,
+    autoSignIn: false
+  },
+  emailVerification: {
+     sendOnSignUp: true,
+     autoSignInAfterVerification: false,
+     sendVerificationEmail: async ({ user, url }) => {
+      await resend.emails.send({
+        from: 'Acme <onboarding@resend.dev>',
+        to: user.email,
+        subject: "Two Factor",
+        html: `Click the link to verify your email: ${url}`
+      })
+     },
+     account: {
+       accountLinking: {
+          trustedProviders: ['github']
+       }
+     }
   },
   socialProviders: {
     github: {
@@ -39,6 +58,7 @@ export const auth = betterAuth({
         }
       },
       skipVerificationOnEnable: true
-    })
+    }),
+    nextCookies()
   ]
 });
